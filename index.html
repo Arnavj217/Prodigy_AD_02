@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>To-Do List</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #fbd3e9, #bbd2c5);
+      margin: 0;
+      padding: 10px;
+      color: #333;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 420px;
+      margin: auto;
+      background: #fffdfc;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      color: #6a0572;
+    }
+
+    #taskInput {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+    }
+
+    #addTaskBtn {
+      width: 100%;
+      padding: 12px;
+      background: #6a0572;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #addTaskBtn:hover {
+      background: #8e24aa;
+    }
+
+    .task {
+      display: flex;
+      align-items: center;
+      background: #f1eff6;
+      border: 1px solid #e0d4f7;
+      padding: 10px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      transition: background 0.3s;
+    }
+
+    .task:hover {
+      background: #e7e1f9;
+    }
+
+    .task input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(1.2);
+    }
+
+    .task span {
+      flex: 1;
+      margin-right: 10px;
+      font-size: 1rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: #444;
+    }
+
+    .status {
+      font-weight: bold;
+      font-size: 0.9rem;
+      margin-right: 8px;
+      padding: 3px 6px;
+      border-radius: 8px;
+    }
+
+    .complete {
+      background-color: #c8f7c5;
+      color: #2e7d32;
+    }
+
+    .pending {
+      background-color: #ffcdd2;
+      color: #c62828;
+    }
+
+    button.editBtn, button.deleteBtn {
+      background: none;
+      border: none;
+      color: #5c5c5c;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.3s;
+    }
+
+    button.editBtn:hover {
+      color: #1565c0;
+    }
+
+    button.deleteBtn:hover {
+      color: #d32f2f;
+    }
+
+    input[type="text"].editInput {
+      flex: 1;
+      padding: 6px;
+      font-size: 1rem;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #fff;
+    }
+
+    @media (max-width: 500px) {
+      .task {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .task span, .task input[type="text"].editInput {
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      button.editBtn, button.deleteBtn {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>📝 To-Do List</h2>
+    <input type="text" id="taskInput" placeholder="Enter your task here..." />
+    <button id="addTaskBtn">Add Task</button>
+    <div id="taskList"></div>
+  </div>
+
+  <script>
+    const taskInput = document.getElementById("taskInput");
+    const addTaskBtn = document.getElementById("addTaskBtn");
+    const taskList = document.getElementById("taskList");
+
+    function createTaskElement(taskText) {
+      const taskDiv = document.createElement("div");
+      taskDiv.className = "task";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+
+      const taskSpan = document.createElement("span");
+      taskSpan.textContent = taskText;
+
+      const status = document.createElement("span");
+      status.className = "status pending";
+      status.textContent = "Pending";
+
+      checkbox.addEventListener("change", () => {
+        if (checkbox.checked) {
+          status.textContent = "Complete";
+          status.className = "status complete";
+        } else {
+          status.textContent = "Pending";
+          status.className = "status pending";
+        }
+      });
+
+      const editBtn = document.createElement("button");
+      editBtn.className = "editBtn";
+      editBtn.textContent = "✏️";
+      editBtn.addEventListener("click", () => {
+        const newInput = document.createElement("input");
+        newInput.type = "text";
+        newInput.value = taskSpan.textContent;
+        newInput.className = "editInput";
+
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "💾";
+        saveBtn.style.marginLeft = "10px";
+        saveBtn.onclick = () => {
+          taskSpan.textContent = newInput.value;
+          taskDiv.replaceChild(taskSpan, newInput);
+          taskDiv.replaceChild(editBtn, saveBtn);
+        };
+
+        taskDiv.replaceChild(newInput, taskSpan);
+        taskDiv.replaceChild(saveBtn, editBtn);
+        newInput.focus();
+      });
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "deleteBtn";
+      deleteBtn.textContent = "🗑️";
+      deleteBtn.addEventListener("click", () => {
+        taskList.removeChild(taskDiv);
+      });
+
+      taskDiv.appendChild(checkbox);
+      taskDiv.appendChild(taskSpan);
+      taskDiv.appendChild(status);
+      taskDiv.appendChild(editBtn);
+      taskDiv.appendChild(deleteBtn);
+
+      return taskDiv;
+    }
+
+    addTaskBtn.addEventListener("click", () => {
+      const taskText = taskInput.value.trim();
+      if (taskText !== "") {
+        const newTask = createTaskElement(taskText);
+        taskList.appendChild(newTask);
+        taskInput.value = "";
+      }
+    });
+
+    taskInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        addTaskBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
